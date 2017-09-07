@@ -26,8 +26,14 @@ class Command{
 	void clr(){
 		execlp("/usr/bin/clear","clear",NULL);
 	}
-	void dir(string directory){}
-	void echo(string comment){}
+	void dir(string directory){
+		if(directory == "")
+			execlp("/bin/ls","ls", NULL);
+		else execlp("/bin/ls","ls", directory.c_str(), NULL);
+	}
+	void echo(string comment){
+		cout << comment << endl;
+	}
 };
 
 vector<string> split_string(string input){
@@ -41,6 +47,7 @@ vector<string> split_string(string input){
 }
 
 int main(){
+//cout << MAXPATHLEN;
 string input;
 getline(cin, input);
 
@@ -54,12 +61,23 @@ if(split.size()>0){
 			status = cmd.cd(split[1]);
 		else status = cmd.cd("");
 	}
-	else if (split[0] == "clr")
+	else if (split[0] == "clr"){
 		cmd.clr();
+	}
+	else if (split[0] == "dir"){
+		if(split.size()>1)
+			cmd.dir(split[1]);
+		else cmd.dir("");
+	}
+	else if(split[0] == "echo"){
+		if(split.size()>1)
+			cmd.echo(split[1]);
+		else cmd.echo("");
+	}
 
-	if (status == 0)
-		cout << "failed" << endl;
-	else cout << "success" << endl;
+//	if (status == 0)
+//		cout << "failed" << endl;
+//	else cout << "success" << endl;
 }
 
 //for (unsigned int i=0; i<split.size(); i++)
