@@ -8,6 +8,7 @@
 
 using namespace std;
 
+//encapsulates all user commands from shell
 class Command{
 	public:
 	int cd(string directory){
@@ -36,6 +37,7 @@ class Command{
 	}
 };
 
+//Helper function to split all commands and arguments provided by user
 vector<string> split_string(string input){
 	stringstream stream(input);
 
@@ -46,42 +48,41 @@ vector<string> split_string(string input){
 	return split_input;
 }
 
+
 int main(){
-//cout << MAXPATHLEN;
+//get input
 string input;
 getline(cin, input);
 
 vector<string> split = split_string(input);
 
+
 int status = -1;
 Command cmd;
 if(split.size()>0){
+	//change directory
 	if (split[0] == "cd"){
 		if (split.size()>1)
 			status = cmd.cd(split[1]);
 		else status = cmd.cd("");
 	}
+	//clear screen
 	else if (split[0] == "clr"){
 		cmd.clr();
 	}
+	//set directory or report current
 	else if (split[0] == "dir"){
 		if(split.size()>1)
 			cmd.dir(split[1]);
 		else cmd.dir("");
 	}
+	//print the given argument on the screen
 	else if(split[0] == "echo"){
 		if(split.size()>1)
 			cmd.echo(split[1]);
 		else cmd.echo("");
 	}
-
-//	if (status == 0)
-//		cout << "failed" << endl;
-//	else cout << "success" << endl;
 }
-
-//for (unsigned int i=0; i<split.size(); i++)
-//	cout << split[i] << endl;
 
 
 return 0;
