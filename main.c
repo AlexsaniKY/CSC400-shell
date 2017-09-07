@@ -41,7 +41,6 @@ vector<string> split_string(string input){
 }
 
 int main(){
-//cout << MAXPATHLEN;
 string input;
 getline(cin, input);
 
