@@ -15,7 +15,7 @@ class Command{
 		if(directory == ""){
 			char buffer[MAXPATHLEN];
     		char *path = getcwd(buffer, MAXPATHLEN);
-			cout << path;
+			cout << path << endl;
 			return 1;
 		}
 		int status = chdir(directory.c_str());
@@ -50,42 +50,42 @@ vector<string> split_string(string input){
 
 
 int main(){
-//get input
-string input;
-getline(cin, input);
+	//get input
+	string input;
+	getline(cin, input);
 
-vector<string> split = split_string(input);
+	vector<string> split = split_string(input);
 
 
-int status = -1;
+	int status = -1;
+	string selection;
+	string options;
 
-if(split.size()>0){
+	if(split.size()>0)
+		{selection = split[0];}
+	if(split.size()>1)
+		{options = split[1];}
+	else{options = "";}
+	
 	//change directory
-	if (split[0] == "cd"){
-		if (split.size()>1)
-			status = Command::cd(split[1]);
-		else status = Command::cd("");
+	if (selection == "cd"){
+		status = Command::cd(options);
 	}
 	//clear screen
-	else if (split[0] == "clr"){
+	else if (selection == "clr"){
 		Command::clr();
 	}
 	//set directory or report current
-	else if (split[0] == "dir"){
-		if(split.size()>1)
-			Command::dir(split[1]);
-		else Command::dir("");
+	else if (selection == "dir"){
+		Command::dir(options);
 	}
 	//print the given argument on the screen
-	else if(split[0] == "echo"){
-		if(split.size()>1)
-			Command::echo(split[1]);
-		else Command::echo("");
+	else if(selection == "echo"){
+		Command::echo(options);
 	}
-}
 
 
-return 0;
+	return 0;
 }
 
 
