@@ -11,7 +11,7 @@ using namespace std;
 //encapsulates all user commands from shell
 class Command{
 	public:
-	int cd(string directory){
+	static int cd(string directory){
 		if(directory == ""){
 			char buffer[MAXPATHLEN];
     		char *path = getcwd(buffer, MAXPATHLEN);
@@ -24,15 +24,15 @@ class Command{
 			return 0;
 		return 1;
 	}
-	void clr(){
+	static void clr(){
 		execlp("/usr/bin/clear","clear",NULL);
 	}
-	void dir(string directory){
+	static void dir(string directory){
 		if(directory == "")
 			execlp("/bin/ls","ls", NULL);
 		else execlp("/bin/ls","ls", directory.c_str(), NULL);
 	}
-	void echo(string comment){
+	static void echo(string comment){
 		cout << comment << endl;
 	}
 };
@@ -58,29 +58,29 @@ vector<string> split = split_string(input);
 
 
 int status = -1;
-Command cmd;
+
 if(split.size()>0){
 	//change directory
 	if (split[0] == "cd"){
 		if (split.size()>1)
-			status = cmd.cd(split[1]);
-		else status = cmd.cd("");
+			status = Command::cd(split[1]);
+		else status = Command::cd("");
 	}
 	//clear screen
 	else if (split[0] == "clr"){
-		cmd.clr();
+		Command::clr();
 	}
 	//set directory or report current
 	else if (split[0] == "dir"){
 		if(split.size()>1)
-			cmd.dir(split[1]);
-		else cmd.dir("");
+			Command::dir(split[1]);
+		else Command::dir("");
 	}
 	//print the given argument on the screen
 	else if(split[0] == "echo"){
 		if(split.size()>1)
-			cmd.echo(split[1]);
-		else cmd.echo("");
+			Command::echo(split[1]);
+		else Command::echo("");
 	}
 }
 
