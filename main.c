@@ -11,14 +11,17 @@ using namespace std;
 
 //encapsulates all user commands from shell
 class Command{
-	static void fork_exec(const char *file, vector<string> args){
+	//executes an execlp statement
+	static void fork_exec(const char *file, const char *program, string args = ""){
 		pid_t	pid;
 		pid = fork();
 		if (pid < 0){	//error
 			return;
 		} 
 		else if (pid == 0){	/* Child Process */
-			execlp(file, args[0].c_str(), NULL);
+			if(args.size()>0)
+				execlp(file, program, args.c_str(), NULL);
+			execlp(file, program, NULL);
 		}
 		else{  		/* parent process */
 			wait(NULL);		
@@ -34,24 +37,20 @@ class Command{
 			return 1;
 		}
 		int status = chdir(directory.c_str());
-		vector<string> v = {"ls"};
-		fork_exec("/bin/ls",v);
+		fork_exec("/bin/ls","ls");
 		if (status<0)
 			return 0;
 		return 1;
 	}
 	static void clr(){
-		vector<string> v = {"clear"};
-		fork_exec("/usr/bin/clear",v);
+		fork_exec("/usr/bin/clear", "clear");
 	}
 	static void dir(string directory){
 		if(directory == ""){
-			vector<string> v = {"ls"};
-			fork_exec("/bin/ls", v);
+			fork_exec("/bin/ls", "ls");
 		}
 		else { 
-			vector<string>  v = {"ls", directory.c_str()};
-			fork_exec("/bin/ls", v);
+			fork_exec("/bin/ls", "ls", directory);
 		}
 	}
 	static void echo(string comment){
