@@ -5,11 +5,26 @@
 #include <unistd.h>
 #include <sys/param.h>
 #include <cstdlib>
+#include <sys/wait.h>
 
 using namespace std;
 
 //encapsulates all user commands from shell
 class Command{
+	static void fork_exec(const char *file, vector<string> args){
+		pid_t	pid;
+		pid = fork();
+		if (pid < 0){	//error
+			return;
+		} 
+		else if (pid == 0){	/* Child Process */
+			execlp(file, args[0].c_str(), NULL);
+		}
+		else{  		/* parent process */
+			wait(NULL);		
+		}
+		
+	}
 	public:
 	static int cd(string directory){
 		if(directory == ""){
@@ -19,18 +34,25 @@ class Command{
 			return 1;
 		}
 		int status = chdir(directory.c_str());
-		execlp("/bin/ls","ls",NULL);
+		vector<string> v = {"ls"};
+		fork_exec("/bin/ls",v);
 		if (status<0)
 			return 0;
 		return 1;
 	}
 	static void clr(){
-		execlp("/usr/bin/clear","clear",NULL);
+		vector<string> v = {"clear"};
+		fork_exec("/usr/bin/clear",v);
 	}
 	static void dir(string directory){
-		if(directory == "")
-			execlp("/bin/ls","ls", NULL);
-		else execlp("/bin/ls","ls", directory.c_str(), NULL);
+		if(directory == ""){
+			vector<string> v = {"ls"};
+			fork_exec("/bin/ls", v);
+		}
+		else { 
+			vector<string>  v = {"ls", directory.c_str()};
+			fork_exec("/bin/ls", v);
+		}
 	}
 	static void echo(string comment){
 		cout << comment << endl;
@@ -56,11 +78,8 @@ vector<string> split_string(string input){
 }
 
 
-int main(){
-	//get input
-	string input;
-	getline(cin, input);
 
+void cmd(string input){
 	vector<string> split = split_string(input);
 
 
@@ -90,8 +109,21 @@ int main(){
 	else if(selection == "echo"){
 		Command::echo(split, 1);
 	}
+	else if(selection == "quit"){
+		exit(0);	
+	}
+	else{
+		cout << "unknown request" << endl;	
+	}
+}
 
-
+int main(){
+	//get input
+	string input;
+	while(true){
+		getline(cin, input);
+		cmd(input);
+	}
 	return 0;
 }
 
