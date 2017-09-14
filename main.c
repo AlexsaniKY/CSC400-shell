@@ -35,6 +35,13 @@ class Command{
 	static void echo(string comment){
 		cout << comment << endl;
 	}
+	static void echo(vector<string> comment, int start_index){
+		for(unsigned int i=start_index; i < comment.size(); i++){
+			cout << comment[i] << " ";		
+		}
+		cout << endl;
+			
+	}
 };
 
 //Helper function to split all commands and arguments provided by user
@@ -81,7 +88,7 @@ int main(){
 	}
 	//print the given argument on the screen
 	else if(selection == "echo"){
-		Command::echo(options);
+		Command::echo(split, 1);
 	}
 
 
