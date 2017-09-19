@@ -11,7 +11,7 @@ using namespace std;
 
 //encapsulates all user commands from shell
 class Command{
-	//executes an execlp statement
+	//executes an execlp statement using template parameter packing to allow any number of arguments
 	template<typename... Args>
 	static void fork_exec(const char *file, Args... args){
 		pid_t	pid;
@@ -20,9 +20,7 @@ class Command{
 			return;
 		} 
 		else if (pid == 0){	/* Child Process */
-			//if(args.size()>0)
-				execlp(file, args..., NULL);
-			//execlp(file, program, NULL);
+			execlp(file, args..., NULL);
 		}
 		else{  		/* parent process */
 			wait(NULL);		
@@ -75,7 +73,7 @@ class Command{
 	//int end_of_whitespace = args.find_first_not_of(" ");
 	//string trimmed_args = args.substr(end_of_whitespace);
 	//fork_exec(file.c_str(), program.c_str(), args.c_str());
-	fork_exec("git", "", "add", "main.c");
+	fork_exec("git", "", "commit", "-m", "'attempting to use variadic templates to wrap exec statement'");
 	}
 };
 
