@@ -29,11 +29,13 @@ class Command{
 		
 	}
 	public:
+	static char * get_path(){
+			char buffer[MAXPATHLEN];
+    		return getcwd(buffer, MAXPATHLEN);
+	}
 	static int cd(string directory){
 		if(directory == ""){
-			char buffer[MAXPATHLEN];
-    		char *path = getcwd(buffer, MAXPATHLEN);
-			cout << path << endl;
+			cout << get_path() << endl;
 			return 1;
 		}
 		int status = chdir(directory.c_str());
@@ -61,7 +63,6 @@ class Command{
 			cout << comment[i] << " ";		
 		}
 		cout << endl;
-			
 	}
 };
 
@@ -120,7 +121,11 @@ int main(){
 	//get input
 	string input;
 	while(true){
+		//prompt
+		cout << Command::get_path() << ": ";
+		//get input
 		getline(cin, input);
+		//attempt to run command
 		cmd(input);
 	}
 	return 0;
