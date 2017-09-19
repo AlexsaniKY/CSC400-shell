@@ -12,16 +12,17 @@ using namespace std;
 //encapsulates all user commands from shell
 class Command{
 	//executes an execlp statement
-	static void fork_exec(const char *file, const char *program, string args = ""){
+	template<typename... Args>
+	static void fork_exec(const char *file, Args... args){
 		pid_t	pid;
 		pid = fork();
 		if (pid < 0){	//error
 			return;
 		} 
 		else if (pid == 0){	/* Child Process */
-			if(args.size()>0)
-				execlp(file, program, args.c_str(), NULL);
-			execlp(file, program, NULL);
+			//if(args.size()>0)
+				execlp(file, args..., NULL);
+			//execlp(file, program, NULL);
 		}
 		else{  		/* parent process */
 			wait(NULL);		
@@ -64,6 +65,18 @@ class Command{
 		}
 		cout << endl;
 	}
+	static void run(string app_string){
+	//attempt to extract directory, name, arguments
+	stringstream stream(app_string);
+	string program, args;
+	//stream >> file;
+	//stream >> program;
+	//getline(stream, args);
+	//int end_of_whitespace = args.find_first_not_of(" ");
+	//string trimmed_args = args.substr(end_of_whitespace);
+	//fork_exec(file.c_str(), program.c_str(), args.c_str());
+	fork_exec("git", "", "add", "main.c");
+	}
 };
 
 //Helper function to split all commands and arguments provided by user
@@ -72,11 +85,11 @@ vector<string> split_string(string input){
 
 	vector<string> split_input;
 	string token;
-	while (stream >> token)
+	while (stream >> token){
 		split_input.push_back(token);
+	}
 	return split_input;
 }
-
 
 
 void cmd(string input){
@@ -113,7 +126,8 @@ void cmd(string input){
 		exit(0);	
 	}
 	else{
-		cout << "unknown request" << endl;	
+		Command::run(input);
+		//cout << "unknown request" << endl;	
 	}
 }
 
