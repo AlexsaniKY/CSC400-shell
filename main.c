@@ -9,6 +9,24 @@
 
 using namespace std;
 
+
+//Helper functions to split all commands and arguments provided by user
+void split_string(string input, vector<string> &target_vec){
+	stringstream stream(input);
+
+	string token;
+	while (stream >> token){
+		target_vec.push_back(token);
+	}
+	return ;
+}
+vector<string> split_string(string input){
+	vector<string> split_input;
+	split_string(input, split_input);
+
+	return split_input;
+}
+
 //encapsulates all user commands from shell
 class Command{
 	//executes an execlp statement using template parameter packing to allow any number of arguments
@@ -26,7 +44,8 @@ class Command{
 			wait(NULL);		
 		}
 	}
-	static void fork_execvp(const char *file, vector<string> argv){
+	//executes an execvp statement with 
+	static void fork_execvp(string file, vector<string> argv){
 		char** ptr;
 		const char* arg_arr[argv.size() + 1];
 		for (unsigned int i = 0; i < argv.size(); i++){
@@ -41,17 +60,20 @@ class Command{
 		} 
 		else if (pid == 0){	/* Child Process */
 			ptr = (char**)arg_arr;
-			execvp(file, ptr);
+			execvp(file.c_str(), ptr);
 		}
 		else{  		/* parent process */
 			wait(NULL);		
 		}
 	}
 	public:
+	//Returns the current working directory
 	static char * get_path(){
 			char buffer[MAXPATHLEN];
     		return getcwd(buffer, MAXPATHLEN);
 	}
+	//Changes the directory to the supplied location.
+	//If no location is supplied it simply prints the current one
 	static int cd(string directory){
 		if(directory == ""){
 			cout << get_path() << endl;
@@ -84,37 +106,30 @@ class Command{
 		cout << endl;
 	}
 	static void run(string app_string){
-	//attempt to extract directory, name, arguments
-	//stringstream stream(app_string);
-	//string program, args;
-	//stream >> file;
-	//stream >> program;
+	//attempt to extract name, arguments
+	vector<string> vec;
+	stringstream stream(app_string);
+	string filename, program;
+
+	stream >> filename;
+	if(filename.find("/") == string::npos){
+		vec.push_back("");
+	}
+	split_string(app_string.substr(filename.size()), vec);
+	
 	//getline(stream, args);
 	//int end_of_whitespace = args.find_first_not_of(" ");
 	//string trimmed_args = args.substr(end_of_whitespace);
 	//fork_exec(file.c_str(), program.c_str(), args.c_str());
 	//fork_execlp(app_string.c_str(), "");
-	vector<string> vec = {"", "add", "main.c"};
-	fork_execvp("git", vec);
+	fork_execvp(filename, vec);
 	}
 };
 
-//Helper function to split all commands and arguments provided by user
-vector<string> split_string(string input){
-	stringstream stream(input);
-
-	vector<string> split_input;
-	string token;
-	while (stream >> token){
-		split_input.push_back(token);
-	}
-	return split_input;
-}
 
 
 void cmd(string input){
 	vector<string> split = split_string(input);
-
 
 	int status = -1;
 	string selection;
@@ -125,7 +140,7 @@ void cmd(string input){
 	if(split.size()>1)
 		{options = split[1];}
 	else{options = "";}
-	
+
 	//change directory
 	if (selection == "cd"){
 		status = Command::cd(options);
