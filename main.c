@@ -13,7 +13,7 @@ using namespace std;
 class Command{
 	//executes an execlp statement using template parameter packing to allow any number of arguments
 	template<typename... Args>
-	static void fork_exec(const char *file, Args... args){
+	static void fork_execlp(const char *file, Args... args){
 		pid_t	pid;
 		pid = fork();
 		if (pid < 0){	//error
@@ -25,7 +25,27 @@ class Command{
 		else{  		/* parent process */
 			wait(NULL);		
 		}
-		
+	}
+	static void fork_execvp(const char *file, vector<string> argv){
+		char** ptr;
+		const char* arg_arr[argv.size() + 1];
+		for (unsigned int i = 0; i < argv.size(); i++){
+			arg_arr[i] = argv[i].c_str();
+		}
+		arg_arr[argv.size()] = NULL;
+	
+		pid_t	pid;
+		pid = fork();
+		if (pid < 0){	//error
+			return;
+		} 
+		else if (pid == 0){	/* Child Process */
+			ptr = (char**)arg_arr;
+			execvp(file, ptr);
+		}
+		else{  		/* parent process */
+			wait(NULL);		
+		}
 	}
 	public:
 	static char * get_path(){
@@ -38,20 +58,20 @@ class Command{
 			return 1;
 		}
 		int status = chdir(directory.c_str());
-		fork_exec("/bin/ls","ls");
+		fork_execlp("/bin/ls","ls");
 		if (status<0)
 			return 0;
 		return 1;
 	}
 	static void clr(){
-		fork_exec("/usr/bin/clear", "clear");
+		fork_execlp("/usr/bin/clear", "clear");
 	}
 	static void dir(string directory){
 		if(directory == ""){
-			fork_exec("/bin/ls", "ls");
+			fork_execlp("/bin/ls", "ls");
 		}
 		else { 
-			fork_exec("/bin/ls", "ls", directory);
+			fork_execlp("/bin/ls", "ls", directory);
 		}
 	}
 	static void echo(string comment){
@@ -65,15 +85,17 @@ class Command{
 	}
 	static void run(string app_string){
 	//attempt to extract directory, name, arguments
-	stringstream stream(app_string);
-	string program, args;
+	//stringstream stream(app_string);
+	//string program, args;
 	//stream >> file;
 	//stream >> program;
 	//getline(stream, args);
 	//int end_of_whitespace = args.find_first_not_of(" ");
 	//string trimmed_args = args.substr(end_of_whitespace);
 	//fork_exec(file.c_str(), program.c_str(), args.c_str());
-	fork_exec("git", "", "commit", "-m", "'attempting to use variadic templates to wrap exec statement'");
+	//fork_execlp(app_string.c_str(), "");
+	vector<string> vec = {"", "add", "main.c"};
+	fork_execvp("git", vec);
 	}
 };
 
