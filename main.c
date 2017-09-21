@@ -7,9 +7,10 @@
 #include <cstdlib>
 #include <sys/wait.h>
 
+#include "utility.h"
 using namespace std;
 
-
+/*
 //Helper functions to split all commands and arguments provided by user
 void split_string(string input, vector<string> &target_vec){
 	stringstream stream(input);
@@ -25,7 +26,7 @@ vector<string> split_string(string input){
 	split_string(input, split_input);
 
 	return split_input;
-}
+}*/
 
 //encapsulates all user commands from shell
 class Command{
