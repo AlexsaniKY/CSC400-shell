@@ -10,24 +10,6 @@
 #include "utility.h"
 using namespace std;
 
-/*
-//Helper functions to split all commands and arguments provided by user
-void split_string(string input, vector<string> &target_vec){
-	stringstream stream(input);
-
-	string token;
-	while (stream >> token){
-		target_vec.push_back(token);
-	}
-	return ;
-}
-vector<string> split_string(string input){
-	vector<string> split_input;
-	split_string(input, split_input);
-
-	return split_input;
-}*/
-
 //encapsulates all user commands from shell
 class Command{
 	//executes an execlp statement using template parameter packing to allow any number of arguments
@@ -45,6 +27,7 @@ class Command{
 			wait(NULL);		
 		}
 	}
+
 	//executes an execvp statement with 
 	static void fork_execvp(string file, vector<string> argv){
 		char** ptr;
@@ -67,12 +50,14 @@ class Command{
 			wait(NULL);		
 		}
 	}
+
 	public:
 	//Returns the current working directory
 	static char * get_path(){
 			char buffer[MAXPATHLEN];
     		return getcwd(buffer, MAXPATHLEN);
 	}
+
 	//Changes the directory to the supplied location.
 	//If no location is supplied it simply prints the current one
 	static int cd(string directory){
@@ -86,9 +71,13 @@ class Command{
 			return 0;
 		return 1;
 	}
+
+	//clears screen
 	static void clr(){
 		fork_execlp("/usr/bin/clear", "clear");
 	}
+
+	//prints the current working directory contents or the supplied directory's contents
 	static void dir(string directory){
 		if(directory == ""){
 			fork_execlp("/bin/ls", "ls");
@@ -97,15 +86,21 @@ class Command{
 			fork_execlp("/bin/ls", "ls", directory);
 		}
 	}
+
+	//prints the supplied string back to the user
 	static void echo(string comment){
 		cout << comment << endl;
 	}
-	static void echo(vector<string> comment, int start_index){
+
+	//echo with vector and start index functionality
+	static void echo(vector<string> comment, int start_index = 0){
 		for(unsigned int i=start_index; i < comment.size(); i++){
 			cout << comment[i] << " ";		
 		}
 		cout << endl;
 	}
+
+	//executes the string as a command line file and arguments
 	static void run(string app_string){
 	//attempt to extract name, arguments
 	vector<string> vec;
@@ -117,12 +112,6 @@ class Command{
 		vec.push_back("");
 	}
 	split_string(app_string.substr(filename.size()), vec);
-	
-	//getline(stream, args);
-	//int end_of_whitespace = args.find_first_not_of(" ");
-	//string trimmed_args = args.substr(end_of_whitespace);
-	//fork_exec(file.c_str(), program.c_str(), args.c_str());
-	//fork_execlp(app_string.c_str(), "");
 	fork_execvp(filename, vec);
 	}
 };
