@@ -10,6 +10,8 @@
 #include "utility.h"
 using namespace std;
 
+bool VERBOSE = false;
+
 //encapsulates all user commands from shell
 class Command{
 	//executes an execlp statement using template parameter packing to allow any number of arguments
@@ -18,13 +20,14 @@ class Command{
 		pid_t	pid;
 		pid = fork();
 		if (pid < 0){	//error
-			return;
+			exit(EXIT_FAILURE);
 		} 
 		else if (pid == 0){	/* Child Process */
 			execlp(file, args..., NULL);
+			exit(EXIT_FAILURE);
 		}
 		else{  		/* parent process */
-			wait(NULL);		
+			waitpid(pid, NULL, 0);		
 		}
 	}
 
@@ -40,14 +43,15 @@ class Command{
 		pid_t	pid;
 		pid = fork();
 		if (pid < 0){	//error
-			return;
+			exit(EXIT_FAILURE);
 		} 
 		else if (pid == 0){	/* Child Process */
 			ptr = (char**)arg_arr;
 			execvp(file.c_str(), ptr);
+			exit(EXIT_FAILURE);
 		}
 		else{  		/* parent process */
-			wait(NULL);		
+			waitpid(pid, NULL, 0);
 		}
 	}
 
@@ -102,17 +106,17 @@ class Command{
 
 	//executes the string as a command line file and arguments
 	static void run(string app_string){
-	//attempt to extract name, arguments
-	vector<string> vec;
-	stringstream stream(app_string);
-	string filename, program;
+		//attempt to extract name, arguments
+		vector<string> vec;
+		stringstream stream(app_string);
+		string filename, program;
 
-	stream >> filename;
-	if(filename.find("/") == string::npos){
-		vec.push_back("");
-	}
-	split_string(app_string.substr(filename.size()), vec);
-	fork_execvp(filename, vec);
+		stream >> filename;
+		if(filename.find("/") == string::npos){
+			vec.push_back("");
+		}
+		split_string(app_string.substr(filename.size()), vec);
+		fork_execvp(filename, vec);
 	}
 };
 
@@ -151,21 +155,59 @@ void cmd(string input){
 		exit(0);	
 	}
 	else{
+		if(VERBOSE) cout << "attempting to run program: " << input << endl;
 		Command::run(input);
 		//cout << "unknown request" << endl;	
 	}
 }
 
-int main(){
-	//get input
+void forked_cmd(string input){
+	pid_t	pid;
+	pid = fork();
+	if (pid < 0){	//error
+		cout << "An error occurred in creating child process" << endl;
+		exit(0);
+	} 
+	else if (pid == 0){	/* Child Process */
+		cmd(input);
+		if(VERBOSE) cout << "exiting child process" << endl;
+		exit(0);
+	}
+	else{  		/* parent process */
+		if(VERBOSE) cout << "Child process in pid = " << pid << endl;
+		return;		
+	}
+
+}
+
+
+int main(int argc, char *argv[]){
+	if(argc > 1)
+		if(strcmp(argv[1], "-v") == 0)
+			VERBOSE = true;
+
 	string input;
+	string whitespace = " \t\f\v\n\r";
+	char last_char = ' ';
+	size_t last_char_index;
 	while(true){
 		//prompt
 		cout << Command::get_path() << ": ";
 		//get input
 		getline(cin, input);
-		//attempt to run command
-		cmd(input);
+		last_char_index = input.find_last_not_of(whitespace);
+		if(last_char_index != string::npos)
+			last_char = input[last_char_index];
+		else last_char = ' ';
+
+		if(last_char == '&'){
+			if(VERBOSE) cout << "forking a command" << endl;
+			forked_cmd(input.substr(0, last_char_index));
+		}
+		else cmd(input);
+		
+		waitpid(-1, NULL, WNOHANG);
+
 	}
 	return 0;
 }
