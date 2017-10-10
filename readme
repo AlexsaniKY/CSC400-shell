@@ -1,0 +1,23 @@
+Alexander Williams
+Myshell program documentation
+
+The program "myshell" can be built with a make statement in the parent directory and ran with one or no arguments.
+
+The command line argument "-v" is interpreted as verbose mode, in which more control flow steps and actions are reported to the user.  It will only be recognized if it is the first argument received.
+
+Using this shell will initially report the directory you called it from, usually the directory containing myshell, ex. "/home/dev/Documents: ".
+
+It will prompt each new command with the working directory.
+
+There are 5 commands directly executed from the shell, and any other commands are interpreted as system calls.
+	1- cd <directory> : this changes the current directory, including the PWD environment variable. If no directory argument is provided, it prints the current directory.  If the directory provided cannot be located, an error is reported to the user.
+	2- clr : this does not accept arguments, it clears the screen and prompts for the next command.
+	3- dir <directory> : lists the contents of the directory provided, or the contents of the current working directory if no directory argument is provided.
+	4- echo <comment> : this displays the comment afterwards back to the user, all whitespace is truncated to a space character ' '.
+	5- quit : this does not accept any arguments, and quits the shell program.
+
+All provided arguments must be whitespace separated.  Arguments past the amount specifically denoted for each command will be ignored.  The only command that accepts more than one argument is the echo command.
+
+Any command not recognized by the myshell program will be executed as a system call.  This is executed with the execvp command, and will accept an arbitrary amount of arguments, whitespace delimited (an '\n' character is interpreted as the end of a command and will not be an acceptable delimiter).  Quotations will not encapsulate a single argument in the current version, they are interpreted as normal characters and whitespace will delimit arguments.
+
+An ampersand (&) will invoke the statement as a separate forked process.  Whitespace before or after is ignored, the last non-whitespace character will be checked to be an ampersand, and if so it is forked.
